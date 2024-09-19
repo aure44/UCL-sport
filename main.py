@@ -64,12 +64,13 @@ for option in list_sport:
 
 driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click() # open chosen sport tab
 
-while True:
-    try:
-        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
-        break
-    except:
-        driver.refresh()
-        time.sleep(5)
+# while True:
+#     try:
+#         driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
+#         break
+#     except:
+#         driver.refresh()
+#         time.sleep(5)
 
+driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
 driver.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/footer/div/button[2]".format(index_sport)).click() # click ok to register
