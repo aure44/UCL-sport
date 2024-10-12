@@ -94,25 +94,23 @@ print("tab opened")
 days_difference = datetime(2024, int(args.date[-2:]), int(args.date[:2])) - datetime(2024, int(current_date[-2:]), int(current_date[:2]))
 print(days_difference)
 
-if days_difference.days < 6:
-    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
-    driver.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/footer/div/button[2]".format(index_sport)).click() # click ok to register
-else:
-    seconds_to_wait = (datetime(2024, int(current_date[-2:]), int(current_date[:2])) + timedelta(days=days_difference.days-7) - datetime.now()).total_seconds()
-    print("time to wait until the registration opens", seconds_to_wait)
+seconds_to_wait = (datetime(2024, int(current_date[-2:]), int(current_date[:2])) + timedelta(days=days_difference.days-7) - datetime.now()).total_seconds()
+print("time to wait until the registration opens", seconds_to_wait)
 
+if seconds_to_wait-60 > 0:
+    print("Waiting midnight...")
     time.sleep(seconds_to_wait-60) # wait until there is one minute left to register
 
-    print("Now waiting actively")
+print("Now waiting actively")
 
-    while True:
-        try:
-            driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click()
-            driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click()
-            driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
-            driver.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/footer/div/button[2]".format(index_sport)).click() # click ok to register
-            break
-        except:
-            time.sleep(1)
+while True:
+    try:
+        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
+        driver.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/footer/div/button[2]".format(index_sport)).click() # click ok to register
+        break
+    except:
+        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click()
+        driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click()
+        time.sleep(1)
 
 print("registration finished successfully")
