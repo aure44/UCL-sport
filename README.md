@@ -38,11 +38,10 @@ line 6 : from selenium.webdriver.**chrome**.options import Options
 line 7 : from selenium.webdriver.**chrome**.service import Service
 ```
 
-If your driver is not found, you might need to decomment and change line 36 to give the path to the driver. This step is actually necessary for linux machine I believe.
-
 > [!NOTE]
-> Same apply to every driver you would want to use. Further tweaking might be required though.
+> Same apply to every driver you would want to use. Further tweaking might be required though. I just covered the two main ones.
 
+If your driver is not found, you might need to uncomment and change line 36 to give the path to the driver. This step is actually necessary for linux machine I believe.
 
 # Motivation :
 
