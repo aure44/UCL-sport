@@ -33,7 +33,7 @@ opts = Options()
 if args.headless:
     opts.add_argument("--headless")
 
-service = Service("/usr/bin/geckodriver")
+# service = Service("/usr/bin/geckodriver")
 service=Service()
 
 driver = webdriver.Firefox(options=opts, service=service)
