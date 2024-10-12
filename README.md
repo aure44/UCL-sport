@@ -12,6 +12,11 @@ python3 main.py username password sport day/month hour:min-hour:min
 
 > e.g. python3 main.py artglenzin 12345678 Escalade 08/05 20:30-22:30
 
+> [!NOTE]
+> There is an optional argument which is -head or --headless to make it run in background i.e. no firefox window will open. If you run this code without -head on a virtual machine/server with no GUI, you will have an error because no window can be opened (because no GUI (graphical user interface)).
+
+> e.g. python3 main.py artglenzin 12345678 Escalade 08/05 20:30-22:30 -head
+
 # How does it work :
 
 A webbrowser driver (like geckodriver for firefox) allows python (via selenium) to control a browser. In this case, it has been hard-coded to navigate UCLouvain sport website to log in, change the date, search the sport and finally register to the right sport activity.
@@ -32,6 +37,8 @@ line 6 : from selenium.webdriver.**chrome**.options import Options
 ```
 line 7 : from selenium.webdriver.**chrome**.service import Service
 ```
+
+If your driver is not found, you might need to decomment and change line 36 to give the path to the driver. This step is actually necessary for linux machine I believe.
 
 > [!NOTE]
 > Same apply to every driver you would want to use. Further tweaking might be required though.
