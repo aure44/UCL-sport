@@ -8,6 +8,7 @@ from selenium.webdriver.firefox.service import Service
 
 import argparse
 import time
+from datetime import timedelta
 from datetime import datetime
 
 parser = argparse.ArgumentParser()
@@ -20,9 +21,17 @@ parser.add_argument('hour')
 
 args = parser.parse_args()
 
+if len(args.date)!=5 or args.date[2]!="/" or not args.date[:2].isdigit() or not args.date[-2:].isdigit():
+    raise ValueError("The date format string should be like ../.., if the day/month number is single digit, add a zero, i.e. 7/1 -> 07/01")
+
+hour = args.hour
+if len(hour)!=11 or not hour[:2].isdigit() or not hour[3:5].isdigit() or not hour[6:8].isdigit() or not hour[9:].isdigit() or hour[2]!=":" or hour[5]!="-" or hour[8]!=":":
+    raise ValueError("The hour format string should be like ..:..-..:.., e.g. 21:30-23:00")
+
 opts = Options()
 opts.add_argument("--headless")
 service = Service("/usr/bin/geckodriver")
+service=Service()
 
 driver = webdriver.Firefox(options=opts, service=service)
 wait = WebDriverWait(driver, 2)  # initialization
@@ -48,7 +57,7 @@ print("logged in")
 
 element = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/nav/div[2]/div/div[1]/div/h6')
 web_date = element.text.split(" ")[2][:5]
-
+current_date = web_date
 print("date", web_date)
 
 while web_date!=args.date:
@@ -69,7 +78,7 @@ try:
     i=1
     while True:
         info = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[1]/div/div[1]/div/p'.format(str(i)))
-        list_sport.append(str(info.text.split(" ")[0]) + ">" + str(info.text.split(" ")[2]) + str(i))
+        list_sport.append(str(info.text.split(" ")[0]) + "-" + str(info.text.split(" ")[2]) + str(i))
         i += 1
 except:
     pass
@@ -82,15 +91,28 @@ driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1
 
 print("tab opened")
 
-# while True:
-#     try:
-#         driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
-#         break
-#     except:
-#         driver.refresh()
-#         time.sleep(5)
+days_difference = datetime(2024, int(args.date[-2:]), int(args.date[:2])) - datetime(2024, int(current_date[-2:]), int(current_date[:2]))
+print(days_difference)
 
-driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
-driver.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/footer/div/button[2]".format(index_sport)).click() # click ok to register
+if days_difference.days < 6:
+    driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
+    driver.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/footer/div/button[2]".format(index_sport)).click() # click ok to register
+else:
+    seconds_to_wait = (datetime(2024, int(current_date[-2:]), int(current_date[:2])) + timedelta(days=days_difference.days-7) - datetime.now()).total_seconds()
+    print("time to wait until the registration opens", seconds_to_wait)
+
+    time.sleep(seconds_to_wait-60) # wait until there is one minute left to register
+
+    print("Now waiting actively")
+
+    while True:
+        try:
+            driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click()
+            driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click()
+            driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
+            driver.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/footer/div/button[2]".format(index_sport)).click() # click ok to register
+            break
+        except:
+            time.sleep(1)
 
 print("registration finished successfully")
