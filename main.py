@@ -29,6 +29,23 @@ hour = args.hour
 if len(hour)!=11 or not hour[:2].isdigit() or not hour[3:5].isdigit() or not hour[6:8].isdigit() or not hour[9:].isdigit() or hour[2]!=":" or hour[5]!="-" or hour[8]!=":":
     raise ValueError("The hour format string should be like ..:..-..:.., e.g. 21:30-23:00")
 
+### Check when will the registration open (more than 7 days -> will wait until it opens)
+
+current_date = datetime.now().strftime("%d/%m")
+days_difference = datetime(2024, int(args.date[-2:]), int(args.date[:2])) - datetime(2024, int(current_date[-2:]), int(current_date[:2]))
+print("Session is in " + str(days_difference.days) + " days")
+
+seconds_to_wait = (datetime(2024, int(current_date[-2:]), int(current_date[:2])) + timedelta(days=days_difference.days-7) - datetime.now()).total_seconds()
+
+if seconds_to_wait-120 > 0:
+    print("time to wait until the registration opens :", seconds_to_wait)
+    print("Waiting midnight...")
+    time.sleep(seconds_to_wait-120) # wait until there is two minutes left to register
+    print("Now waiting actively")
+else:
+    print("registration already open")
+
+
 opts = Options()
 if args.headless:
     opts.add_argument("--headless")
@@ -43,7 +60,8 @@ action = ActionChains(driver)
 print("Driver initialized")
 
 driver.get("https://sites.uclouvain.be/uclsport/seances")  # open the site
-driver.maximize_window()
+if not args.headless:
+    driver.maximize_window()
 
 print("Website acquired")
 
@@ -94,28 +112,17 @@ driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1
 
 print("sport tab opened")
 
-days_difference = datetime(2024, int(args.date[-2:]), int(args.date[:2])) - datetime(2024, int(current_date[-2:]), int(current_date[:2]))
-print("Session is in " + str(days_difference.days) + " days")
-
-seconds_to_wait = (datetime(2024, int(current_date[-2:]), int(current_date[:2])) + timedelta(days=days_difference.days-7) - datetime.now()).total_seconds()
-
-if seconds_to_wait-60 > 0:
-    print("time to wait until the registration opens :", seconds_to_wait)
-    print("Waiting midnight...")
-    time.sleep(seconds_to_wait-60) # wait until there is one minute left to register
-    print("Now waiting actively")
-else:
-    print("registration already open")
-
 count=0
 while True:
     count+=1
     try:
         driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[2]/div/div/div/div/div[2]/div/div/button".format(index_sport)).click() # click register
+        time.sleep(0.2)
         driver.find_element(By.XPATH, "/html/body/div[2]/div[1]/div/div/footer/div/button[2]".format(index_sport)).click() # click ok to register
         break
     except:
         driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click()
+        time.sleep(0.5)
         driver.find_element(By.XPATH, "/html/body/div[1]/div/div/main/div/div[{0}]/div[1]/div[2]/span".format(index_sport)).click()
         time.sleep(1)
         if not count%20:
